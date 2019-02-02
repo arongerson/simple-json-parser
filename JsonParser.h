@@ -25,6 +25,9 @@ private:
 	void D(JsonItem* parentArray);
 	void E(JsonItem* parentArray);
 	void V(JsonItem* parentObject, std::string key);
+	void VQuote(char token, JsonItem* parentObject, std::string key);
+	void AQuote(char token, JsonItem* parentObject);
+	void DQuote(char token, JsonItem* parentArray);
 	void log(std::string&);
 	void logError(std::string&);
 	void cleanUp();
@@ -37,7 +40,7 @@ private:
 public:
 	JsonParser(const std::string& json, bool showLogs);
 	JsonParser(bool showLogs, std::string filePath);
-	JsonItem* parse();
+	const JsonItem* parse();
 	~JsonParser();
 };
 

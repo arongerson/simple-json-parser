@@ -123,28 +123,10 @@ void JsonParser::J(JsonItem* parentObject, std::string key) {
 }
 
 void JsonParser::D(JsonItem* parentArray) {
-	if (isExpectedToken('\"', true)) {
-		std::string value = getValueToken();
-		JsonItem* item;
-		if (isExpectedToken('\"', true)) {
-			item = new JsonText(value);
-			parentArray->addItem(item);
-			B(parentArray);
-		} else {
-			std::string error = "\" expected";
-			logError(error);
-		}
+	if (isExpectedToken('"', true)) {
+		DQuote('"', parentArray);
 	} else if (isExpectedToken('\'', true)) {
-		std::string value = getValueToken();
-		JsonItem* item;
-		if (isExpectedToken('\'', true)) {
-			item = new JsonText(value);
-			parentArray->addItem(item);
-			B(parentArray);
-		} else {
-			std::string error = "' expected";
-			logError(error);
-		}
+		DQuote('\'', parentArray);
 	} else if (isExpectedToken('[', true)) {
 		JsonItem* jsonArray = new JsonArray();
 		E(jsonArray);
@@ -178,35 +160,41 @@ void JsonParser::D(JsonItem* parentArray) {
 	}
 }
 
+void JsonParser::DQuote(char token, JsonItem* parentArray) {
+	std::string value = getValueToken();
+	JsonItem* item;
+	if (isExpectedToken(token, true)) {
+		item = new JsonText(value);
+		parentArray->addItem(item);
+		B(parentArray);
+	} else {
+		std::string error = token + " expected";
+		logError(error);
+	}
+}
+
 void JsonParser::A(JsonItem* parentObject) {
-	if (isExpectedToken('\"', true)) {
-		std::string key = getKeyToken();
-		if (isExpectedToken('\"', true)) {
-			if (isExpectedToken(':', true)) {
-				V(parentObject, key);
-			} else {
-				std::string error = ": expected";
-				logError(error);
-			}
-		} else {
-			std::string error = "\" expected";
-			logError(error);
-		}
+	if (isExpectedToken('"', true)) {
+		AQuote('"', parentObject);
 	} else if (isExpectedToken('\'', true)) {
-		std::string key = getKeyToken();
-		if (isExpectedToken('\'', true)) {
-			if (isExpectedToken(':', true)) {
-				V(parentObject, key);
-			} else {
-				std::string error = ": expected";
-				logError(error);
-			}
+		AQuote('\'', parentObject);
+	} else {
+		std::string error = "\" or ' expected";
+		logError(error);
+	}
+}
+
+void JsonParser::AQuote(char token, JsonItem* parentObject) {
+	std::string key = getKeyToken();
+	if (isExpectedToken(token, true)) {
+		if (isExpectedToken(':', true)) {
+			V(parentObject, key);
 		} else {
-			std::string error = "' expected";
+			std::string error = ": expected";
 			logError(error);
 		}
 	} else {
-		std::string error = "\" or ' expected";
+		std::string error = token + " expected";
 		logError(error);
 	}
 }
@@ -237,35 +225,30 @@ void JsonParser::E(JsonItem* parentArray) {
 	if (isExpectedToken(']', false)) {
 		// do nothing
 	} else {
-		// printFunc("D()");
 		D(parentArray);
 	}
 }
 
 void JsonParser::V(JsonItem* parentObject, std::string key) {
 	if (isExpectedToken('\'', true)) {
-		std::string value = getValueToken();
-		if (isExpectedToken('\'', true)) {
-			JsonItem* item = new JsonText(value);
-			parentObject->addItem(key, item);
-			C(parentObject, key);
-		} else {
-			std::string error = "' expected";
-			logError(error);
-		}
+		VQuote('\'', parentObject, key);
 	} else if (isExpectedToken('\"', true)) {
-		std::string value = getValueToken();
-		if (isExpectedToken('\"', true)) {
-			JsonItem* item = new JsonText(value);
-			parentObject->addItem(key, item);
-			C(parentObject, key);
-		} else {
-			std::string error = "\" expected";
-			logError(error);
-		}
+		VQuote('"', parentObject, key);
 	} else {
 		J(parentObject, key);
 		C(parentObject, key);
+	}
+}
+
+void JsonParser::VQuote(char token, JsonItem* parentObject, std::string key) {
+	std::string value = getValueToken();
+	if (isExpectedToken(token, true)) {
+		JsonItem* item = new JsonText(value);
+		parentObject->addItem(key, item);
+		C(parentObject, key);
+	} else {
+		std::string error = token + " expected";
+		logError(error);
 	}
 }
 
@@ -283,7 +266,7 @@ std::string JsonParser::readFile(std::string filePath) {
 	return text;
 }
 
-JsonItem* JsonParser::parse() {
+const JsonItem* JsonParser::parse() {
 	json = json.append("$");
 	log(json);
 	std::string dummyKey = "";
