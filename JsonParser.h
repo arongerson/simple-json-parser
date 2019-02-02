@@ -13,7 +13,6 @@
 
 class JsonParser {
 private:
-	const std::string DIR = "C:/Users/Aron/Desktop/json/";
 	std::string json;
 	std::string error;
 	unsigned int tokenFrom;
@@ -34,10 +33,10 @@ private:
 	std::string getKeyToken();
 	std::string getValueToken();
 	std::string getError();
-	std::string readFile(std::string filename);
+	std::string readFile(std::string filePath);
 public:
 	JsonParser(const std::string& json, bool showLogs);
-	JsonParser(bool showLogs, std::string filename);
+	JsonParser(bool showLogs, std::string filePath);
 	JsonItem* parse();
 	~JsonParser();
 };

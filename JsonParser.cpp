@@ -18,11 +18,11 @@ JsonParser::JsonParser(const std::string& json, bool showLogs) :
 	json(json), tokenFrom(0), showLogs(showLogs), parserDataStructure(nullptr) {
 }
 
-JsonParser::JsonParser(bool showLogs, const std::string filename): 
+JsonParser::JsonParser(bool showLogs, const std::string filePath):
 	tokenFrom(0), showLogs(showLogs), parserDataStructure(nullptr) {
 	std::string msg = "reading the file";
 	log(msg);
-	json = readFile(filename);
+	json = readFile(filePath);
 }
 
 JsonParser::~JsonParser() {
@@ -269,9 +269,9 @@ void JsonParser::V(JsonItem* parentObject, std::string key) {
 	}
 }
 
-std::string JsonParser::readFile(std::string filename) {
+std::string JsonParser::readFile(std::string filePath) {
 	std::ifstream file;
-	file.open(DIR + filename);
+	file.open(filePath);
 	std::string line;
 	std::string text = "";
 	if (file.is_open()) {
