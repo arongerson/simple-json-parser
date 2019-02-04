@@ -34,3 +34,7 @@ JsonItem* JsonObject::getItem(std::string key) const {
 std::string JsonObject::getType() const {
 	return "JsonObject";
 }
+
+unsigned int JsonObject::size() const {
+	return data.size();
+}

@@ -37,3 +37,7 @@ std::string JsonItem::getType() const {
 	throw("not allowed");
 }
 
+unsigned int JsonItem::size() const {
+	throw("not allowed");
+}
+

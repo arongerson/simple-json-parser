@@ -13,6 +13,8 @@ public:
 	virtual std::vector<JsonItem*> getItems();
 	virtual void addItem(JsonItem* item);
 	virtual std::string getType() const;
+	virtual unsigned int size() const;
 	void cleanUp();
+
 };
 

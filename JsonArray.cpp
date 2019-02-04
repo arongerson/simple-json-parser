@@ -33,3 +33,7 @@ void JsonArray::addItem(JsonItem* item) {
 std::string JsonArray::getType() const {
 	return "JsonArray";
 }
+
+unsigned int JsonArray::size() const {
+	return data.size();
+}

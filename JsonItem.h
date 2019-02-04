@@ -12,5 +12,6 @@ public:
 	virtual void addItem(JsonItem* item);
 	virtual void addItem(std::string key, JsonItem* value);
 	virtual std::string getType() const;
+	virtual unsigned int size() const;
 };
 
