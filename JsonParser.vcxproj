@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="JsonNumber.h" />
     <ClInclude Include="JsonText.h" />
     <ClInclude Include="JsonArray.h" />
     <ClInclude Include="JsonParser.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="JsonItem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="JsonNumber.cpp" />
     <ClCompile Include="JsonText.cpp" />
     <ClCompile Include="JsonArray.cpp" />
     <ClCompile Include="JsonParser.cpp" />

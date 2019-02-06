@@ -9,7 +9,19 @@ JsonItem::JsonItem() {
 JsonItem::~JsonItem() {
 }
 
-std::string JsonItem::getItem() const {
+std::string JsonItem::getText() const {
+	throw("not allowed");
+}
+
+double JsonItem::getDouble() const {
+	throw("not allowed");
+}
+
+float JsonItem::getFloat() const {
+	throw("not allowed");
+}
+
+int JsonItem::getInt() const {
 	throw("not allowed");
 }
 

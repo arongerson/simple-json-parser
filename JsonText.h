@@ -3,12 +3,12 @@
 #include <iostream>
 class JsonText :
 	public JsonItem {
-private:
+protected:
 	std::string text;
 public:
 	JsonText(std::string text);
 	~JsonText();
-	virtual std::string getItem() const;
+	virtual std::string getText() const;
 	virtual std::string getType() const;
 };
 

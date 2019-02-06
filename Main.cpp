@@ -10,8 +10,10 @@ int main() {
 	JsonParser parser(false, filename);
 	const JsonItem* ds = parser.parse();
 	std::string title = ds->getItem("glossary")->getItem("GlossDiv")->
-		getItem("GlossList")->getItem("GlossEntry")->getItem("GlossDef")->getItem("GlossSeeAlso")->getItem(0)->getItem();
+		getItem("GlossList")->getItem("GlossEntry")->getItem("GlossDef")->getItem("GlossSeeAlso")->getItem(0)->getText();
+	int number = ds->getItem("glossary")->getItem("age")->getInt();
 	std::cout << title << std::endl;
+	std::cout << "number: " << number << std::endl;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

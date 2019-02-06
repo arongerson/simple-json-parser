@@ -8,7 +8,7 @@ JsonText::JsonText(std::string text):JsonItem(), text(text) {
 JsonText::~JsonText() {
 }
 
-std::string JsonText::getItem() const {
+std::string JsonText::getText() const {
 	return text;
 }
 

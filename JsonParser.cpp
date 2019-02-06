@@ -2,7 +2,7 @@
 
 J -> [E] | {A}
 E -> D | e
-D -> 'k'B | "k"B | [E]B | {A}B
+D -> 'k'B | "k"B | nB | [E]B | {A}B, n is a number 
 B -> ,D | e
 A -> 'k':V | "k":V
 V -> JC | 'k'C | "k"C
@@ -11,6 +11,11 @@ C -> ,A | e
 // e stands for epsilon, k is any identifier
 
 */
+
+// TO-DO:
+// escape \" and \'
+// multiline json file
+// searching to the end of the file 
 #include "pch.h"
 #include "JsonParser.h"
 
@@ -55,6 +60,20 @@ bool JsonParser::isExpectedToken(char expectedToken, bool consumable) {
 	return false;
 }
 
+bool JsonParser::isNumeric() {
+	char token = json.at(tokenFrom);
+	while (token == ' ' || token == '\n' || token == '\r') {
+		tokenFrom++;
+		token = json.at(tokenFrom);
+	}
+	if ((token >= '0' && token <= '9') || token == '-') {
+		std::string msg = "token: " + token;
+		log(msg);
+		return true;
+	}
+	return false;
+}
+
 std::string JsonParser::getError() {
 	return error;
 }
@@ -88,9 +107,49 @@ std::string JsonParser::getValueToken() {
 	return json.substr(start, tokenFrom - start);
 }
 
+std::string JsonParser::getNumber() {
+	unsigned int start = tokenFrom;
+	char token = json.at(tokenFrom);
+	// delimiters of a number: , ] } SPACE
+	bool canAcceptDecimalPoint = false;
+	bool canAcceptE = false;
+	bool canAcceptMinus = true;
+	unsigned int count = 0;
+	while ((token >= '0' && token <= '9') || ((token == 'e' || token == 'E') && canAcceptE)
+		|| (token == '-' && canAcceptMinus) || (token == '.' && canAcceptDecimalPoint)) {
+		if (count == 0) {
+			canAcceptDecimalPoint = true;
+			canAcceptE = true;
+			canAcceptMinus = false;
+		}
+		if (token == '.') {
+			canAcceptDecimalPoint = false;
+		} else if (token == 'e' || token == 'E') {
+			canAcceptMinus = true;
+			canAcceptE = false;
+			canAcceptDecimalPoint = false;
+		} else {
+			canAcceptMinus = false;
+		}
+		tokenFrom++;
+		token = json.at(tokenFrom);
+		count++;
+	}
+	// a number can't end with a -, e or E
+	char lastNumberCharacter = toupper(json.at(tokenFrom - 1));
+	if (lastNumberCharacter == '-' || lastNumberCharacter == 'E') {
+		throw("wrong number format");
+	}
+	return json.substr(start, tokenFrom - start);
+}
+
+unsigned int JsonParser::getClosestNumberDelimiter() {
+	return 0;
+}
+
 void JsonParser::logError(std::string& message) {
 	error = message;
-	exit(0);
+	throw(message);
 }
 
 void JsonParser::J(JsonItem* parentObject, std::string key) {
@@ -127,6 +186,11 @@ void JsonParser::D(JsonItem* parentArray) {
 		DQuote('"', parentArray);
 	} else if (isExpectedToken('\'', true)) {
 		DQuote('\'', parentArray);
+	} else if (isNumeric()) {
+		std::string number = getNumber();
+		JsonItem* jsonNumber = new JsonNumber(number);
+		parentArray->addItem(jsonNumber);
+		B(parentArray);
 	} else if (isExpectedToken('[', true)) {
 		JsonItem* jsonArray = new JsonArray();
 		E(jsonArray);
@@ -173,17 +237,25 @@ void JsonParser::DQuote(char token, JsonItem* parentArray) {
 	}
 }
 
+/**
+processes the key portion of the object item, AQuote is the helper method
+refactored to avoid repeating the same code for single and double quotes
+*/
 void JsonParser::A(JsonItem* parentObject) {
 	if (isExpectedToken('"', true)) {
 		AQuote('"', parentObject);
 	} else if (isExpectedToken('\'', true)) {
 		AQuote('\'', parentObject);
 	} else {
+		// a key should start with a quote
 		std::string error = "\" or ' expected";
 		logError(error);
 	}
 }
 
+/**
+checks whether the key has a matching closing quote then proceeds to process the value of the key
+*/
 void JsonParser::AQuote(char token, JsonItem* parentObject) {
 	std::string key = getKeyToken();
 	if (isExpectedToken(token, true)) {
@@ -199,6 +271,9 @@ void JsonParser::AQuote(char token, JsonItem* parentObject) {
 	}
 }
 
+/**
+ensures an array has a closing square bracket or the items are separated with a comma
+*/
 void JsonParser::B(JsonItem* parentArray) {
 	if (isExpectedToken(']', false)) {
 		// do nothing
@@ -210,6 +285,9 @@ void JsonParser::B(JsonItem* parentArray) {
 	}
 }
 
+/**
+ensures the object has a closing brace or the items of the object are separated by a comma
+*/
 void JsonParser::C(JsonItem* parentObject, std::string key) {
 	if (isExpectedToken('}', false)) {
 		// do nothing 
@@ -221,6 +299,9 @@ void JsonParser::C(JsonItem* parentObject, std::string key) {
 	}
 }
 
+/**
+with this an empty array can be accepted as a valid JSON
+*/
 void JsonParser::E(JsonItem* parentArray) {
 	if (isExpectedToken(']', false)) {
 		// do nothing
@@ -229,11 +310,19 @@ void JsonParser::E(JsonItem* parentArray) {
 	}
 }
 
+/**
+ensures the value of an object is either a string in quotes, a number in the correct format, an object or an array
+*/
 void JsonParser::V(JsonItem* parentObject, std::string key) {
 	if (isExpectedToken('\'', true)) {
 		VQuote('\'', parentObject, key);
 	} else if (isExpectedToken('\"', true)) {
 		VQuote('"', parentObject, key);
+	} else if (isNumeric()) {
+		std::string number = getNumber();
+		JsonItem* jsonNumber = new JsonNumber(number);
+		parentObject->addItem(key, jsonNumber);
+		C(parentObject, key);
 	} else {
 		J(parentObject, key);
 		C(parentObject, key);

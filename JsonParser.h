@@ -10,6 +10,7 @@
 #include "JsonArray.h"
 #include "JsonObject.h"
 #include "JsonText.h"
+#include "JsonNumber.h"
 
 class JsonParser {
 private:
@@ -32,9 +33,12 @@ private:
 	void logError(std::string&);
 	void cleanUp();
 	bool isExpectedToken(char expectedToken, bool consumable);
+	bool isNumeric();
 	bool showLogs;
 	std::string getKeyToken();
 	std::string getValueToken();
+	std::string getNumber();
+	unsigned int getClosestNumberDelimiter();
 	std::string getError();
 	std::string readFile(std::string filePath);
 public:

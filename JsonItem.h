@@ -5,7 +5,10 @@ class JsonItem {
 public:
 	JsonItem();
 	virtual ~JsonItem();
-	virtual std::string getItem() const;
+	virtual std::string getText() const;
+	virtual double getDouble() const;
+	virtual float getFloat() const;
+	virtual int getInt() const;
 	virtual JsonItem* getItem(unsigned int index) const;
 	virtual JsonItem* getItem(const std::string key) const;
 	virtual std::vector<JsonItem*> getItems();
