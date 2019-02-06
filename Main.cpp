@@ -7,13 +7,18 @@
 int main() {
 	std::string text = "{'name' : 'aron'}";
 	std::string filename = "json1.txt";
-	JsonParser parser(false, filename);
-	const JsonItem* ds = parser.parse();
-	std::string title = ds->getItem("glossary")->getItem("GlossDiv")->
-		getItem("GlossList")->getItem("GlossEntry")->getItem("GlossDef")->getItem("GlossSeeAlso")->getItem(0)->getText();
-	int number = ds->getItem("glossary")->getItem("age")->getInt();
-	std::cout << title << std::endl;
-	std::cout << "number: " << number << std::endl;
+	try {
+		JsonParser parser(true, filename);
+		const JsonItem* ds = parser.parse();
+		std::string title = ds->getItem("glossary")->getItem("GlossDiv")->
+			getItem("GlossList")->getItem("GlossEntry")->getItem("GlossDef")->getItem("GlossSeeAlso")->getItem(0)->getText();
+		int number = ds->getItem("glossary")->getItem("age")->getInt();
+		std::cout << title << std::endl;
+		std::cout << "number: " << number << std::endl;
+	} catch (const char* message) {
+		std::cout << "error: " << message << std::endl;
+	}
+	
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

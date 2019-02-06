@@ -97,8 +97,10 @@ std::string JsonParser::getKeyToken() {
 
 std::string JsonParser::getValueToken() {
 	char token = json.at(tokenFrom);
+	// the opening quote character is one position behind the current position of the pointer 
+	char openToken = json.at(tokenFrom - 1); 
 	unsigned int start = tokenFrom;
-	while (token != '\'' && token != '\"') {
+	while (token != openToken) {
 		tokenFrom++;
 		token = json.at(tokenFrom);
 	}
