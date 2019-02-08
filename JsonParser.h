@@ -14,6 +14,8 @@
 
 class JsonParser {
 private:
+	const char ESCAPE_TOKEN = '\\';
+	const char escapable[9] = {'"', '\\', '\/', 'b', 'f', 'n', 'r', 't', 'u'};
 	std::string json;
 	std::string error;
 	unsigned int tokenFrom;
@@ -41,6 +43,7 @@ private:
 	unsigned int getClosestNumberDelimiter();
 	std::string getError();
 	std::string readFile(std::string filePath);
+	void escape();
 public:
 	JsonParser(const std::string& json, bool showLogs);
 	JsonParser(bool showLogs, std::string filePath);

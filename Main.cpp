@@ -8,13 +8,15 @@ int main() {
 	std::string text = "{'name' : 'aron'}";
 	std::string filename = "json1.txt";
 	try {
-		JsonParser parser(true, filename);
+		JsonParser parser(false, filename);
 		const JsonItem* ds = parser.parse();
 		std::string title = ds->getItem("glossary")->getItem("GlossDiv")->
 			getItem("GlossList")->getItem("GlossEntry")->getItem("GlossDef")->getItem("GlossSeeAlso")->getItem(0)->getText();
 		int number = ds->getItem("glossary")->getItem("age")->getInt();
 		std::cout << title << std::endl;
 		std::cout << "number: " << number << std::endl;
+		std::string firstTitle = ds->getItem("glossary")->getItem("title")->getText();
+		std::cout << "first title: " << firstTitle << std::endl;
 	} catch (const char* message) {
 		std::cout << "error: " << message << std::endl;
 	}

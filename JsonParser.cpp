@@ -83,7 +83,7 @@ std::string JsonParser::getKeyToken() {
 	token = toupper(token);
 	if (!((token >= 'A' && token <= 'Z') || token == '_')) {
 		std::string error = "identifier expected";
-		logError(error); // this will half the program 
+		logError(error);
 	}
 	unsigned int start = tokenFrom;
 	while ((token >= 'A' && token <= 'Z') || token == '_' || (token >= '0' && token <= '9')) {
@@ -101,12 +101,29 @@ std::string JsonParser::getValueToken() {
 	char openToken = json.at(tokenFrom - 1); 
 	unsigned int start = tokenFrom;
 	while (token != openToken) {
+		if (token == ESCAPE_TOKEN) {
+			escape();
+		}
 		tokenFrom++;
 		token = json.at(tokenFrom);
 	}
 	std::string msg = "value: " + json.substr(start, tokenFrom - start);
 	log(msg);
 	return json.substr(start, tokenFrom - start);
+}
+
+void JsonParser::escape() {
+	tokenFrom++;
+	char tokenAfterBackslash = json.at(tokenFrom);
+	unsigned int numOfEscapableChars = sizeof(escapable) / sizeof(*escapable);
+	for (unsigned int i = 0; i < numOfEscapableChars; i++) {
+		if (tokenAfterBackslash == escapable[i]) {
+			return;
+		}
+	}
+	// no escapable character was found
+	std::string msg = "not a valid escape character";
+	logError(msg); // this will throw an exception
 }
 
 std::string JsonParser::getNumber() {
