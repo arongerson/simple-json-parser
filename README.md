@@ -1,5 +1,3 @@
-<h1>Simple JSON parse</h1>
-
 # Introduction
 Class project in the theory of computation class to design the grammar and develop a JSON parser.
 
